@@ -2,8 +2,9 @@
 -- Source: fhvhv_2025-03.parquet (~20M rows)
 
 select
-    cast(pickup_datetime as date) as trip_date,   -- truncate pickup_datetime to a calendar date, alias it
+    cast(pickup_datetime as date) as trip_date, -- truncate pickup_datetime to a calendar date, alias it
+    dayname(pickup_datetime) as day_of_week,   -- truncate pickup_datetime to a calendar day, alias it
     count(*) as trip_count                        -- count the rows
 from trips
-group by 1
+group by 1, 2
 order by trip_count desc;
