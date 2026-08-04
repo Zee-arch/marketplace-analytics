@@ -1,0 +1,19 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python3",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.extraPaths": ["${workspaceFolder}"],
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.DS_Store": true
+  },
+  "files.watcherExclude": {
+    "**/data/**": true,
+    "**/warehouse/**": true,
+    "**/.venv/**": true
+  },
+  "search.exclude": {
+    "**/data": true,
+    "**/warehouse": true,
+    "**/.venv": true
+  }
+}
