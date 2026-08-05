@@ -8,3 +8,9 @@ select
 from trips
 group by 1, 2
 order by trip_count desc;
+
+ /* 
+ We discovered that Friday and Saturday are main demanding days where increased rides are booked except an exception. 
+ 2nd Sunday of the Month came out to be an odd one out day in terms of trip count because the the time zone change 
+ happening on that day. 
+ */
