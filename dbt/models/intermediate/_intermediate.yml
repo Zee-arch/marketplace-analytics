@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: int_trips_enriched
+    description: >
+      One row per trip (same grain as stg_trips), enriched with company
+      label, zone names, date/time buckets, and the three derived
+      timestamp intervals. The reusable building block every mart and
+      future question should select from instead of re-deriving these.
+    columns:
+      - name: provider_name
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Uber', 'Lyft']
+
+      - name: pickup_zone
+        tests:
+          - not_null
+
+      - name: dropoff_zone
+        tests:
+          - not_null
+
+      - name: day_type
+        tests:
+          - accepted_values:
+              values: ['weekday', 'weekend']
+
+      - name: hour_of_day
+        tests:
+          - not_null

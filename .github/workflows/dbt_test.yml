@@ -1,0 +1,69 @@
+name: dbt tests
+
+# Runs the full pipeline against real data on every push/PR to main:
+# download the actual NYC TLC parquet file, build the DuckDB warehouse
+# from scratch (both are gitignored, so CI starts with neither), run
+# every dbt model, then run every dbt test.
+#
+# Deliberate tradeoff, stated plainly rather than hidden: this downloads
+# real data from NYC's public CDN instead of testing against a small
+# synthetic fixture. That's slower and depends on an external service
+# being up, which is a real fragility -- but it exercises the actual
+# ingestion script end-to-end instead of a stand-in, which matters more
+# for a project whose whole point is demonstrating the real pipeline.
+# The data cache below means this cost is only paid once, not every run.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dbt-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Cache raw HVFHV data (500MB+, doesn't change once published)
+        uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: hvfhv-data-2025-03-v1
+
+      - name: Create venv and install Python deps
+        run: |
+          uv venv
+          uv pip install duckdb polars pyarrow requests dbt-core dbt-duckdb
+
+      - name: Download HVFHV data (skips download if cache hit)
+        run: |
+          source .venv/bin/activate
+          python ingest/download_hvfhv.py 2025-03
+
+      - name: Build DuckDB warehouse (trips view + zones table)
+        run: |
+          source .venv/bin/activate
+          python ingest/init_warehouse.py
+
+      - name: Install dbt packages
+        working-directory: dbt
+        run: |
+          source ../.venv/bin/activate
+          dbt deps --profiles-dir .
+
+      - name: Run dbt models
+        working-directory: dbt
+        run: |
+          source ../.venv/bin/activate
+          dbt run --profiles-dir .
+
+      - name: Run dbt tests
+        working-directory: dbt
+        run: |
+          source ../.venv/bin/activate
+          dbt test --profiles-dir .

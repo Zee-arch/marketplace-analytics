@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: fct_trips
+    description: >
+      Trip-grain fact table -- the query surface for BI tools and future
+      analysis. Same content as int_trips_enriched, materialized as a
+      table for query performance.
+    columns:
+      - name: provider_name
+        tests:
+          - not_null
+
+  - name: mart_daily_trip_summary
+    description: "One row per calendar date -- daily trends dashboard table."
+    columns:
+      - name: trip_date
+        tests:
+          - not_null
+          - unique   # one row per date -- the whole point of this mart's grain
+
+  - name: mart_hourly_demand
+    description: "One row per (hour_of_day, day_type) -- hourly demand curve, sliceable by weekday/weekend."
+    tests:
+      # composite-key grain check -- no single column here is unique on
+      # its own (hour_of_day repeats across day_types and vice versa),
+      # so this needs dbt_utils rather than a plain `unique` test
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - hour_of_day
+            - day_type
+    columns:
+      - name: hour_of_day
+        tests:
+          - not_null
