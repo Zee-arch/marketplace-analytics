@@ -9,8 +9,21 @@ from trips
 group by 1, 2
 order by trip_count desc;
 
- /* 
- We discovered that Friday and Saturday are main demanding days where increased rides are booked except an exception. 
- 2nd Sunday of the Month came out to be an odd one out day in terms of trip count because the the time zone change 
- happening on that day. 
- */
+/*
+Finding: Friday and Saturday are the peak-demand days all month — weekly
+seasonality dominates day-to-day variation, so week-over-week comparisons
+are meaningful while day-over-day ones are mostly noise.
+
+Exception: 2025-03-09 (the 2nd Sunday) undercounts relative to its neighbor
+Sundays (03-16, 03-23) by ~1.5%, breaking what's otherwise a flat ~645k
+band. Cause: 2025-03-09 is the date U.S. Daylight Saving Time begins —
+clocks skip 2:00am straight to 3:00am, so that calendar day has only 23
+wall-clock hours. Since pickup_datetime is a naive local timestamp with no
+timezone offset, the 2-3am hour is structurally absent from the clock, not
+just from demand — any trips that would've picked up in that window can't
+be timestamped into it. This is a silent data-quality artifact, not an
+error: the query runs clean and the number looks like a plausible quiet
+Sunday unless you separately know the date is DST. (2025-03-30 is also
+below its neighbors, for a still-unexplained reason unrelated to DST —
+flagged as open, not force-fit into this explanation.)
+*/

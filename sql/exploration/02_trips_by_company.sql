@@ -11,4 +11,18 @@ from trips                    -- always say where the rows come from
 group by 1                      -- position 1 = the case expression above, not the words it outputs
 order by provider_count desc;
 
-/* Roughly 70.8% Uber / 29.2% Lyft — Uber running about 2.4x Lyft's volume in NYC for this month. */
+/*
+Finding: 14,547,181 Uber trips vs. 5,989,698 Lyft trips in March 2025 —
+roughly a 70.8% / 29.2% split, Uber running ~2.4x Lyft's volume. Sanity
+check: the two counts sum to 20,536,879, exactly matching the total trip
+count from Q1 — confirms the CASE expression isn't dropping or
+double-counting any hvfhs_license_num values.
+
+This is a snapshot of NYC HVFHV volume specifically, not Uber/Lyft's full
+US or global footprint — NYC's ratio shouldn't be assumed to generalize.
+Worth revisiting alongside Q3 (shared-ride behavior): if the two companies
+differ this much in whether/how they report ride-pooling, it's worth
+checking whether their overall product mix (e.g., premium tiers, WAV
+availability) differs enough in this market to be a confound in any
+company-level comparison built later in this project.
+*/
