@@ -6,3 +6,8 @@ __pycache__/
 .DS_Store
 *.duckdb
 *.parquet
+
+# working notes for Claude Code sessions -- useful locally for continuity,
+# not meant for the public repo (process/session narrative, not deliverable)
+CLAUDE.md
+SESSION-*.md
