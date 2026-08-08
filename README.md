@@ -1,9 +1,11 @@
 # Marketplace Intelligence Platform
 
+[![dbt tests](https://github.com/Zee-arch/marketplace-analytics/actions/workflows/dbt_test.yml/badge.svg)](https://github.com/Zee-arch/marketplace-analytics/actions/workflows/dbt_test.yml)
+
 An end-to-end analytics project built on NYC's public High-Volume For-Hire
-Vehicle (Uber/Lyft) trip records — SQL-first exploration now, with a dbt
-transformation layer, a delivery/growth-metrics vertical, and a causal
-inference study on NYC's 2025 congestion pricing policy planned next.
+Vehicle (Uber/Lyft) trip records — exploratory SQL, a tested dbt
+transformation pipeline with CI, and a causal inference study on NYC's
+2025 congestion pricing policy planned next.
 
 Built to demonstrate the skill set a data analytics role actually tests:
 SQL fluency under real messy data, correct metric definitions, data
@@ -28,20 +30,52 @@ demand patterns without needing a second dataset.
 |---|---|
 | Warehouse (dev) | DuckDB |
 | Warehouse (serving) | BigQuery (planned) |
-| Transformation | dbt (planned) |
+| Transformation | dbt |
 | Orchestration | Dagster (planned) |
+| CI | GitHub Actions (real data, real warehouse build, on every push) |
 | Analysis | Python: polars, pandas, statsmodels, scipy |
 | BI | Power BI, Metabase (planned) |
 
 ## Repository structure
 
 ```
-sql/exploration/     -- one .sql file per question, header comment states
-                         the business question, ends with a written finding
-docs/memos/           -- one-page decision memos (planned)
-ingest/               -- data download scripts
-notebooks/            -- exploratory notebooks
+sql/exploration/         -- one .sql file per question, header comment states
+                             the business question, ends with a written finding
+dbt/
+  models/staging/         -- stg_trips, stg_zones -- thin, 1:1 with the source
+  models/intermediate/    -- int_trips_enriched -- zone joins, date/hour
+                             buckets, provider label, computed once
+  models/marts/           -- fct_trips, mart_daily_trip_summary,
+                             mart_hourly_demand -- the analysis-ready layer
+  tests/                  -- singular tests (regression checks, thresholds)
+ingest/
+  download_hvfhv.py        -- idempotent, retried data download
+  init_warehouse.py        -- builds warehouse/dev.duckdb from data/raw/
+.github/workflows/        -- CI: downloads real data, runs dbt test on every push
+docs/memos/                -- one-page decision memos (planned)
+notebooks/                 -- exploratory notebooks
 ```
+
+## The dbt pipeline
+
+Three layers, each with a specific job: **staging** models are thin
+1:1 copies of the raw source (no logic); **intermediate** computes every
+reusable derivation exactly once (zone names, Uber/Lyft label, day-of-week/
+hour buckets, the wait/approach/dwell time intervals); **marts** are the
+analysis-ready tables a BI tool would actually query.
+
+26 automated tests cover both layers — not_null/unique/accepted_values on
+raw columns, referential integrity between trips and zones, composite-key
+grain checks on the hourly mart, and regression tests that check a mart's
+totals against the raw source directly (the same sanity checks done by
+hand in `sql/exploration/`, now running on every push instead of once).
+
+One test is a deliberate, visible warning rather than a hard failure: 3
+trips have an impossible (`<=0`) duration (see Q4). That's a known,
+already-investigated data quality fact, not a bug to silently hide — the
+test uses `error_if`/`warn_if` thresholds so it stays visible on every run
+without failing CI on an issue that's already been triaged, and would
+only turn into a real failure if that count grew.
 
 ## Approach
 
@@ -132,14 +166,14 @@ exactly what the planned difference-in-differences analysis is for.
 
 ## What's next
 
-- **dbt project**: staging → intermediate → marts layers, dbt tests, CI
 - **Delivery vertical**: Instacart Market Basket data — cohorts,
   retention, LTV, RFM segmentation (mobility data has no user IDs, so
   user-level growth metrics live here instead)
 - **Centerpiece**: difference-in-differences on NYC's January 2025
   congestion pricing policy — Manhattan south of 60th St as treatment,
-  outer boroughs as control
-- Power BI dashboard + decision memos
+  outer boroughs as control. Needs additional pre/post months downloaded
+  beyond the current March-2025-only dataset
+- Dagster orchestration, Power BI dashboard, decision memos
 
 ## Running this locally
 
@@ -147,8 +181,19 @@ exactly what the planned difference-in-differences analysis is for.
 git clone https://github.com/Zee-arch/marketplace-analytics.git
 cd marketplace-analytics
 uv venv && source .venv/bin/activate
-uv pip install duckdb polars pyarrow requests jupyterlab
-# download fhvhv_2025-03.parquet and taxi_zone_lookup.csv into data/raw/
-# (see ingest/ once download scripts land)
+uv pip install duckdb polars pyarrow requests dbt-core dbt-duckdb jupyterlab
+
+# download the raw data (idempotent -- safe to re-run)
+python ingest/download_hvfhv.py 2025-03
+
+# build warehouse/dev.duckdb (the trips view + zones table) from it
+python ingest/init_warehouse.py
+
+# run a hand-written exploration query
 duckdb warehouse/dev.duckdb < sql/exploration/01_trips_per_day.sql
+
+# or run the dbt pipeline (staging -> intermediate -> marts) + all tests
+cd dbt
+dbt run --profiles-dir .
+dbt test --profiles-dir .
 ```
