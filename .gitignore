@@ -16,3 +16,4 @@ SESSION-*.md
 dbt/target/
 dbt/dbt_packages/
 dbt/logs/
+dbt/.user.yml   # dbt-generated anonymous telemetry ID, not project content
