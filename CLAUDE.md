@@ -46,30 +46,40 @@ Every artifact in the repo should map to at least one JD bullet.
 
 ---
 
-## THE LEARNING RULE — this governs how Claude assists in this repo
+## OPERATING MODE — as of 2026-08-05, changed from the original learning rule
 
-Data interviews are live technical exams. Code written by an assistant that
-Zaeem cannot reproduce under pressure is worse than useless — it creates
-false confidence and he fails the technical round.
+**Original rule (2026-08-04–05, Q1–Q3):** Zaeem wrote every analytical query,
+every metric definition, and every finding by hand. Claude explained concepts
+and reviewed, but never wrote analytical SQL or memos, on the theory that
+code he can't reproduce under interview pressure is worse than useless.
 
-**Claude handles:**
-- Environment setup, dependency management, file structure
-- Ingestion scripts, download logic, retries
-- dbt scaffolding, YAML, `profiles.yml`, CI pipelines
-- Explaining concepts, reviewing queries he wrote
-- Debugging *after* he has attempted a fix and described what he tried
+**What actually happened:** across Q1–Q3 his SQL was consistently *correct*
+on real attempts — the CASE/SUM/GROUP BY logic, the syntax debugging, all
+genuine. What actually cost time was tooling friction unrelated to SQL
+skill: a filename with a comma in it breaking shell commands, a stale VS
+Code tab, a second AI assistant giving conflicting diagnoses in parallel.
 
-**Zaeem handles by hand, always:**
-- Every analytical SQL query — all window functions, joins, aggregations, CTEs
-- All metric definitions and business logic
-- All written memos
+**Zaeem's explicit decision (2026-08-05), after Claude pushed back twice**
+**and laid out the tradeoff a third time with a hybrid option on the table:**
+full handoff. Claude now writes, runs, and interprets every query, and
+writes every finding, for the rest of the project. This was a deliberate,
+informed choice, not an impulsive one — don't relitigate it by default.
 
-**When asked to write an analytical query: don't.** Explain the concept
-needed, point at the syntax, let him attempt it, then review. Three failed
-attempts → write it with line-by-line commentary on why each clause exists.
+**Current split:**
+- **Claude handles:** everything — SQL logic, metric definitions, running
+  queries, findings/memos, commits, GitHub. Explain the reasoning behind
+  each query inline (comments) and in chat, so the *artifact* stays
+  learnable even though Zaeem isn't producing it by hand anymore.
+- **Zaeem handles:** review. Reading, questioning, catching things that look
+  wrong, and — this matters — flagging it explicitly if he wants to reclaim
+  hands-on ownership of a specific question or the project generally. If
+  that happens, revert to the original rule for whatever he reclaims.
+- Environment/tooling ownership (venv, VS Code config, dependency
+  management) was always Claude's regardless of mode and hasn't changed.
 
-Hold this rule even if he asks to break it in a moment of impatience. Push
-back once, then respect his call.
+If a future session is unsure which mode is active, ask rather than assume
+— this file is the source of truth, but confirm with Zaeem if it's been a
+while since 2026-08-05, since he may have reclaimed part of this.
 
 ---
 
@@ -156,6 +166,61 @@ marketplace-analytics/
 - Every metric gets a written definition before it gets a query.
 - Memos end with a recommendation and a number attached.
 - Commit after every working query — small commits, honest messages.
+
+---
+
+## Schema reference for `trips` (HVFHV)
+
+Live truth is always `describe trips;` in the `duckdb` shell — this is a
+snapshot for quick reference so you're not re-querying it every session.
+
+```
+hvfhs_license_num      varchar     dispatching_base_num   varchar
+originating_base_num   varchar     request_datetime       timestamp
+on_scene_datetime      timestamp   pickup_datetime         timestamp
+dropoff_datetime       timestamp   PULocationID            integer
+DOLocationID            integer    trip_miles              double
+trip_time               bigint     base_passenger_fare     double
+tolls                   double     bcf                     double
+sales_tax               double     congestion_surcharge    double
+airport_fee              double    tips                    double
+driver_pay               double    shared_request_flag     varchar
+shared_match_flag       varchar    access_a_ride_flag      varchar
+wav_request_flag        varchar    wav_match_flag          varchar
+cbd_congestion_fee       double
+```
+
+`zones` (from `taxi_zone_lookup.csv`): `LocationID`, `Borough`, `Zone`,
+`service_zone`. Join to `trips.PULocationID` / `trips.DOLocationID` to turn
+zone IDs into names.
+
+### The four timestamps — the highest-value thing in this schema
+
+| Column | Marks |
+|---|---|
+| `request_datetime` | rider taps request |
+| `on_scene_datetime` | driver arrives at pickup |
+| `pickup_datetime` | rider gets in, trip starts |
+| `dropoff_datetime` | trip ends |
+
+Derived intervals, each a different business question:
+- `pickup − request` = **rider wait time** (marketplace health)
+- `on_scene − request` = driver approach time (supply density)
+- `pickup − on_scene` = dwell time (curb friction)
+- `dropoff − pickup` = trip duration (should match `trip_time`, in **seconds**)
+
+### Money columns
+
+Rider pays: `base_passenger_fare`, `tolls`, `bcf`, `sales_tax`,
+`congestion_surcharge`, `airport_fee`, `tips`, `cbd_congestion_fee`.
+`driver_pay` is what the driver receives — a **separate** number, not a
+subset. The gap is platform take rate.
+
+### Flags
+
+`shared_request_flag` / `shared_match_flag` / `access_a_ride_flag` /
+`wav_request_flag` / `wav_match_flag` are all `'Y'`/`'N'` varchar, confirmed
+via `select distinct ... from trips;` — not booleans, not `1`/`0`.
 
 ---
 
