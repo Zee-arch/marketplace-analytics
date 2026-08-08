@@ -1,0 +1,17 @@
+# Committed to the repo deliberately, unlike most dbt projects: the usual
+# reason to keep profiles.yml out of version control is that it holds
+# credentials (warehouse passwords, API keys). This one doesn't -- it
+# points at a local DuckDB file with no auth of any kind, so committing it
+# is what makes `git clone && dbt run` actually work for anyone (including
+# future-you on a different machine) without extra setup. If a BigQuery
+# or other credentialed target gets added later, that target's config
+# should NOT go here -- use a separate untracked profiles.yml or env vars
+# for it instead.
+
+marketplace_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: '../warehouse/dev.duckdb'
+      threads: 4

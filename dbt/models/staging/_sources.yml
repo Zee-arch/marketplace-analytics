@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: main   # DuckDB's default schema -- where `trips` and `zones` already live
+    tables:
+      - name: trips
+        description: >
+          NYC TLC High Volume For-Hire Vehicle trip records. One row per
+          trip. A DuckDB VIEW over the raw parquet file(s) in data/raw/ --
+          not copied into the database. Currently loaded: March 2025.
+      - name: zones
+        description: >
+          NYC TLC taxi zone lookup table -- maps LocationID to Borough,
+          Zone name, and service_zone. Loaded from taxi_zone_lookup.csv.

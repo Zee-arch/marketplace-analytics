@@ -1,0 +1,26 @@
+name: 'marketplace_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: 'marketplace_analytics'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  marketplace_analytics:
+    staging:
+      +materialized: view      # cheap, always reflects the raw source live
+    intermediate:
+      +materialized: view      # reusable building blocks, not queried directly by BI tools
+    marts:
+      +materialized: table     # final analysis-ready tables -- materialized so BI queries are fast

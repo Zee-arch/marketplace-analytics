@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: stg_trips
+    description: >
+      One row per HVFHV trip, renamed/typed from the raw source. No
+      business logic applied at this layer.
+    columns:
+      - name: hvfhs_license_num
+        description: "TLC license code for the dispatching company."
+        tests:
+          - not_null
+          - accepted_values:
+              # all 4 officially issued HVFHS codes, not just the 2 that
+              # happen to appear in the current month's data -- this
+              # should stay valid if more months (or reintroduced
+              # companies) get loaded later
+              values: ['HV0002', 'HV0003', 'HV0004', 'HV0005']
+
+      - name: pickup_datetime
+        tests:
+          - not_null
+
+      - name: dropoff_datetime
+        tests:
+          - not_null
+
+      - name: pickup_location_id
+        tests:
+          - not_null
+          - relationships:
+              # codifies the check done by hand in sql/exploration/05 --
+              # every pickup zone must exist in the zone lookup
+              to: ref('stg_zones')
+              field: location_id
+
+      - name: dropoff_location_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_zones')
+              field: location_id
+
+      - name: shared_request_flag
+        description: "Did the rider request a shared/pooled ride? Y/N, not boolean."
+        tests:
+          - accepted_values:
+              values: ['Y', 'N']
+
+      - name: shared_match_flag
+        description: "Was the rider actually matched with another rider? Y/N, not boolean."
+        tests:
+          - accepted_values:
+              values: ['Y', 'N']
+
+  - name: stg_zones
+    description: "NYC TLC taxi zone lookup, renamed from the raw source."
+    columns:
+      - name: location_id
+        tests:
+          - not_null
+          - unique
