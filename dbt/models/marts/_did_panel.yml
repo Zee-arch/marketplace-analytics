@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: mart_did_zone_daily_panel
+    description: >
+      Zone x day panel for the congestion-pricing DiD. Deliberately spans
+      the full Oct 2024-Mar 2025 range, unlike every other mart in this
+      project (all March-2025-only by design). Unbalanced panel -- not
+      every zone has a row for every date (zero-trip days produce no
+      row, not a zero row).
+    columns:
+      - name: trip_date
+        tests:
+          - not_null
+      - name: location_id
+        tests:
+          - not_null
+      - name: zone_group
+        tests:
+          - accepted_values:
+              values:
+                - treatment
+                - outer_borough_control
+                - manhattan_north_control
+      - name: is_treatment
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: is_post
+        tests:
+          - accepted_values:
+              values: [0, 1]
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - trip_date
+            - location_id
