@@ -13,7 +13,13 @@ select
     count(*) as total_trips,
     sum(case when cbd_congestion_fee > 0 then 1 else 0 end) as fee_paying_trips,
     round(100.0 * sum(case when cbd_congestion_fee > 0 then 1 else 0 end) / count(*), 2) as pct_paying_fee
-from trips;
+from trips
+-- scoped to March 2025 (added 2026-08-13, trips now spans 6 months for
+-- the DiD analysis -- see 01). Especially important here: pre-2025 rows
+-- have cbd_congestion_fee = NULL, not 0 -- NULL > 0 is neither true nor
+-- false, so an unfiltered version wouldn't error, it would just silently
+-- dilute pct_paying_fee with rows that could never have paid it
+where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01';
 
 -- Part 2: top 10 pickup zones specifically among fee-paying trips --
 -- i.e. where do CRZ-bound trips most often start?
@@ -24,6 +30,7 @@ select
 from trips t
 join zones z on t.PULocationID = z.LocationID
 where t.cbd_congestion_fee > 0
+  and t.pickup_datetime >= '2025-03-01' and t.pickup_datetime < '2025-04-01'
 group by 1, 2
 order by fee_paying_trip_count desc
 limit 10;

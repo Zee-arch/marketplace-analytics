@@ -16,6 +16,8 @@ with pu_do_counts as (
     from trips t
     join zones pu on t.PULocationID = pu.LocationID
     join zones dz on t.DOLocationID = dz.LocationID
+    -- scoped to March 2025 (added 2026-08-13, trips now spans 6 months -- see 01)
+    where t.pickup_datetime >= '2025-03-01' and t.pickup_datetime < '2025-04-01'
     group by 1, 2
 ),
 ranked as (

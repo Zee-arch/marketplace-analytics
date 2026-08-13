@@ -47,6 +47,14 @@ select
     ), 2) as naive_driver_share_pct,
     round(100.0 * sum(driver_pay) / sum(base_passenger_fare), 2) as driver_share_of_fare_pct
 from trips
+-- scoped to March 2025 (added 2026-08-13, trips now spans 6 months -- see
+-- 01). Especially important here: total_rider_cost sums cbd_congestion_fee
+-- directly, unguarded -- pre-2025 rows have that column as NULL, and any
+-- arithmetic expression touching a NULL evaluates to NULL, so those rows
+-- would silently vanish from total_rider_cost/naive_driver_share_pct's SUM
+-- while still counting in trip_count -- an inconsistency across columns
+-- in the same row, not just a wrong total
+where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
 group by 1
 order by 1;
 

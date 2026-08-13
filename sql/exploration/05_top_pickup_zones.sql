@@ -11,9 +11,14 @@ select
     -- scalar subquery for the grand total -- evaluated once, not per group,
     -- avoids needing a window function or extra GROUP BY column for a
     -- single constant
-    round(100.0 * count(*) / (select count(*) from trips), 2) as pct_of_all_trips
+    round(100.0 * count(*) / (
+        select count(*) from trips
+        where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
+    ), 2) as pct_of_all_trips
 from trips t
 join zones z on t.PULocationID = z.LocationID
+-- scoped to March 2025 (added 2026-08-13, trips now spans 6 months -- see 01)
+where t.pickup_datetime >= '2025-03-01' and t.pickup_datetime < '2025-04-01'
 group by 1, 2
 order by trip_count desc
 limit 10;

@@ -15,6 +15,8 @@ select
     cast(matched_count as double) / total_trips as match_rate,
     cast(matched_count as double) / nullif(requested_count, 0) as match_efficiency
 from trips
+-- scoped to March 2025 (added 2026-08-13, trips now spans 6 months -- see 01)
+where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
 group by 1;
 
 /*

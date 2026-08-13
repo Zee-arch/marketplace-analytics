@@ -38,7 +38,9 @@ select
         when abs(trip_time - date_diff('second', pickup_datetime, dropoff_datetime)) > 60
         then 1 else 0
     end) as trip_time_mismatch_trips
-from trips;
+from trips
+-- scoped to March 2025 (added 2026-08-13, trips now spans 6 months -- see 01)
+where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01';
 
 /*
 Finding: median trip is 15.7 min (943s); p90 is 36.5 min; p99 is 66.9 min.

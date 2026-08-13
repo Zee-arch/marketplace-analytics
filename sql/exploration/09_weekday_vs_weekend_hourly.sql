@@ -15,6 +15,8 @@ with day_type_totals as (
         case when dayname(pickup_datetime) in ('Saturday','Sunday') then 'weekend' else 'weekday' end as day_type,
         count(distinct cast(pickup_datetime as date)) as n_days
     from trips
+    -- scoped to March 2025 (added 2026-08-13, trips now spans 6 months -- see 01)
+    where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
     group by 1
 )
 select
@@ -28,6 +30,7 @@ select
         / (select n_days from day_type_totals where day_type = 'weekend')
     ) as avg_weekend_trips
 from trips
+where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
 group by 1
 order by 1;
 

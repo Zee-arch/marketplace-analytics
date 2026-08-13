@@ -8,6 +8,8 @@ select
     end as provider_name,        -- the whole case...end block gets ONE alias
     count(*) as provider_count     -- count needs parens around the star
 from trips                    -- always say where the rows come from
+-- scoped to March 2025 (added 2026-08-13, trips now spans 6 months -- see 01)
+where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
 group by 1                      -- position 1 = the case expression above, not the words it outputs
 order by provider_count desc;
 

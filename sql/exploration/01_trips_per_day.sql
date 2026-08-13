@@ -6,6 +6,12 @@ select
     dayname(pickup_datetime) as day_of_week,   -- truncate pickup_datetime to a calendar day, alias it
     count(*) as trip_count                        -- count the rows
 from trips
+-- explicit filter added 2026-08-13: trips now spans 6 months (Oct 2024-
+-- Mar 2025, downloaded for the congestion-pricing DiD analysis) instead
+-- of just this file's original single month -- without this, re-running
+-- the file would silently produce different numbers than the finding
+-- already written below
+where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
 group by 1, 2
 order by trip_count desc;
 
