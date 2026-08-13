@@ -2,13 +2,14 @@
 
 [![dbt tests](https://github.com/Zee-arch/marketplace-analytics/actions/workflows/dbt_test.yml/badge.svg)](https://github.com/Zee-arch/marketplace-analytics/actions/workflows/dbt_test.yml)
 
-An end-to-end analytics project across two verticals: NYC's public
-High-Volume For-Hire Vehicle (Uber/Lyft) trip records — exploratory SQL,
-a tested dbt transformation pipeline with CI — and Instacart's public
-Market Basket dataset, covering the user-level growth metrics (cohorts,
-retention, churn, RFM, LTV) the mobility data can't support on its own,
-since it has no user IDs. A causal inference study on NYC's 2025
-congestion pricing policy is planned next.
+An end-to-end analytics project spanning exploratory SQL, a tested dbt
+pipeline with CI, user-level growth metrics, and a real causal inference
+study — a difference-in-differences analysis of NYC's January 2025
+congestion pricing policy, the project's centerpiece. Two datasets: NYC's
+public High-Volume For-Hire Vehicle (Uber/Lyft) trip records, and
+Instacart's public Market Basket dataset for the user-level growth
+metrics (cohorts, retention, churn, RFM, LTV) the mobility data can't
+support on its own, since it has no user IDs.
 
 Built to demonstrate the skill set a data analytics role actually tests:
 SQL fluency under real messy data, correct metric definitions, data
@@ -225,15 +226,60 @@ dominated by milk variants (84–86%) and Banana — the single
 most-purchased product in the dataset (491,291 times) at 84.51% reorder
 rate, both a volume leader and a loyalty leader in the same SKU.
 
+## Congestion Pricing DiD — the centerpiece
+
+A difference-in-differences study of NYC's January 5, 2025 congestion
+pricing policy: did it reduce HVFHV trip volume in the Congestion Relief
+Zone (Manhattan south of 60th St), relative to comparable control areas?
+Six months of data (Oct 2024–Mar 2025), full methodology documented
+across four memos in `docs/memos/`, each reproducible with one script.
+
+**Treatment/control definition** (`dbt/seeds/crz_zone_classification.csv`):
+derived empirically from real congestion-fee incidence per zone, not a
+hand-typed street-boundary list — 39 zones at ≥95% incidence
+(unambiguous treatment), 11 zones at 30–95% (genuinely straddle the
+boundary, deliberately excluded rather than force-classified), 193
+outer-borough zones (primary control), 17 Manhattan-north zones
+(robustness control).
+
+1. **Parallel trends** (`01_parallel_trends_check.md`) — a naive
+   pre-period trend test failed (p=0.019), but the cause was a holiday-
+   season confound (treatment zones swing far more than control across
+   Thanksgiving–New Year's), not a real violation. Confirmed by excluding
+   the holiday window (p=0.019 → p=0.80) and cross-checking against a
+   second, independent control group (same pattern, p=0.042 → p=0.77).
+
+2. **Main regression** (`02_did_main_regression.md`) — two-way fixed
+   effects panel regression, clustered SEs. **~5–7% reduction in CRZ trip
+   volume**, robust across specifications and both control groups
+   (primary: −7.37% [−9.37%, −5.32%]; robustness: −4.90%
+   [−7.05%, −2.69%]).
+
+3. **Event study** (`03_event_study.md`) — the effect isn't an instant
+   jump; it builds over ~7 weeks into a persistent ~9–12% reduction that
+   holds through the end of the observed data. Independently
+   cross-checks against Q10's original March-only finding (~7.9% decline,
+   found with no causal framework at all, early in this project).
+
+4. **Secondary outcomes** (`04_secondary_outcomes.md`) — on top of the
+   volume effect: average fare per trip −2.92%, average driver pay per
+   trip −4.43%, driver's share of the fare −0.73 percentage points.
+   Drivers absorbed a disproportionate share of the contraction relative
+   to platform margin.
+
+```bash
+python analysis/parallel_trends.py
+python analysis/parallel_trends_robustness.py
+python analysis/did_main_regression.py
+python analysis/did_event_study.py
+python analysis/did_secondary_outcomes.py
+```
+
 ## What's next
 
-- **Centerpiece**: difference-in-differences on NYC's January 2025
-  congestion pricing policy — Manhattan south of 60th St as treatment,
-  outer boroughs as control. Needs additional pre/post months downloaded
-  beyond the current March-2025-only dataset
 - dbt models for the delivery vertical (currently `sql/exploration/`
   only, same as mobility was before its dbt pipeline landed)
-- Dagster orchestration, Power BI dashboard, decision memos
+- Dagster orchestration, Power BI dashboard
 
 ## Running this locally
 
@@ -241,10 +287,13 @@ rate, both a volume leader and a loyalty leader in the same SKU.
 git clone https://github.com/Zee-arch/marketplace-analytics.git
 cd marketplace-analytics
 uv venv && source .venv/bin/activate
-uv pip install duckdb polars pyarrow requests dbt-core dbt-duckdb kaggle jupyterlab
+uv pip install duckdb polars pyarrow requests dbt-core dbt-duckdb kaggle jupyterlab \
+  statsmodels matplotlib pandas linearmodels
 
-# mobility vertical -- no auth needed, fully public
-python ingest/download_hvfhv.py 2025-03
+# mobility vertical -- no auth needed, fully public. The DiD analysis
+# needs all 6 months (pre + post the 2025-01-05 policy date); a single
+# month is enough for the sql/exploration/ Q1-Q10 files alone
+python ingest/download_hvfhv.py 2024-10 2024-11 2024-12 2025-01 2025-02 2025-03
 
 # delivery vertical -- needs a Kaggle account + API credential first.
 # Generate one at kaggle.com/settings/api under "Legacy API Credentials"
