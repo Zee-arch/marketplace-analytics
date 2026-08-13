@@ -2,16 +2,25 @@
 """
 (Re)build warehouse/dev.duckdb from the raw files in data/raw/.
 
-Creates:
+Mobility vertical (NYC TLC HVFHV):
   - trips: a VIEW over the HVFHV parquet file(s) -- not copied into the
     database, DuckDB reads the parquet directly at query time
   - zones: a TABLE loaded from the taxi zone lookup CSV
 
-Safe to re-run any time (CREATE OR REPLACE on both objects). This is the
+Delivery vertical (Instacart Market Basket):
+  - orders, order_products_prior, order_products_train, products, aisles,
+    departments: TABLES loaded from data/raw/instacart/*.csv. Tables, not
+    views like `trips` -- these are row-based CSVs (order_products_prior
+    alone is 577MB/32M rows), not columnar parquet, so materializing once
+    beats re-parsing CSV on every query downstream.
+
+Safe to re-run any time (CREATE OR REPLACE on every object). This is the
 canonical way to build the warehouse now -- previously done by hand via
 ad-hoc `duckdb` CLI commands in an early session, which meant a fresh
 checkout (or CI, which never has data/warehouse/ -- both gitignored) had
-no way to reconstruct it. Run this after ingest/download_hvfhv.py.
+no way to reconstruct it. Run this after ingest/download_hvfhv.py (and,
+for the delivery vertical, after the Instacart CSVs are downloaded from
+Kaggle -- see CLAUDE.md for the manual auth step that requires).
 
 Uses an absolute path for the parquet glob, not a relative one -- same
 reasoning as the trips view fix documented in CLAUDE.md: a relative path
@@ -26,6 +35,7 @@ import duckdb
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_RAW = REPO_ROOT / "data" / "raw"
+INSTACART_RAW = DATA_RAW / "instacart"
 WAREHOUSE = REPO_ROOT / "warehouse" / "dev.duckdb"
 
 
@@ -57,6 +67,44 @@ def main():
     trip_count = con.execute("select count(*) from trips").fetchone()[0]
     zone_count = con.execute("select count(*) from zones").fetchone()[0]
     print(f"trips: {trip_count:,} rows, zones: {zone_count:,} rows")
+
+    # -- delivery vertical (Instacart) --
+    if INSTACART_RAW.exists():
+        instacart_tables = {
+            "orders": "orders.csv",
+            "order_products_prior": "order_products__prior.csv",
+            "order_products_train": "order_products__train.csv",
+            "products": "products.csv",
+            "aisles": "aisles.csv",
+            "departments": "departments.csv",
+        }
+        missing = [f for f in instacart_tables.values() if not (INSTACART_RAW / f).exists()]
+        if missing:
+            print(f"Instacart CSVs incomplete, skipping delivery vertical -- missing: {missing}")
+        else:
+            for table_name, filename in instacart_tables.items():
+                csv_path = INSTACART_RAW / filename
+                if table_name == "orders":
+                    # order_hour_of_day arrives as a zero-padded string
+                    # ("08") in the raw CSV, not an integer -- cast it here,
+                    # once, instead of every downstream query needing to
+                    # remember to cast it
+                    con.execute(f"""
+                        create or replace table {table_name} as
+                        select
+                            order_id, user_id, eval_set, order_number,
+                            order_dow, cast(order_hour_of_day as integer) as order_hour_of_day,
+                            days_since_prior_order
+                        from read_csv_auto('{csv_path}')
+                    """)
+                else:
+                    con.execute(
+                        f"create or replace table {table_name} as select * from read_csv_auto('{csv_path}')"
+                    )
+                row_count = con.execute(f"select count(*) from {table_name}").fetchone()[0]
+                print(f"{table_name}: {row_count:,} rows")
+    else:
+        print(f"No {INSTACART_RAW} found -- skipping delivery vertical (mobility-only warehouse)")
 
     con.close()
 
