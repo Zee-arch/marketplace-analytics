@@ -10,6 +10,17 @@
 -- trip grain. The correct place to compute that ratio is on top of
 -- SUMMED values in a mart (numerator and denominator both aggregated
 -- first, then divided once) -- exactly how Q7 avoided the same problem.
+--
+-- Explicitly scoped to March 2025: this model (and Q1-Q10's exploration
+-- files) was written when `trips` only covered one month, so none of
+-- them had -- or needed -- their own date filter. As of the DiD analysis,
+-- `trips` covers Oct 2024-Mar 2025 (6 months, needed for pre/post
+-- comparison). Without this WHERE clause, this model and everything
+-- downstream of it (fct_trips, both daily/hourly marts) would silently
+-- start aggregating across all 6 months instead of the one month their
+-- already-committed findings describe -- a real correctness bug, not a
+-- style choice. The DiD panel itself is a separate model that
+-- deliberately does NOT have this filter.
 
 select
     t.hvfhs_license_num,
@@ -70,3 +81,4 @@ select
 from {{ ref('stg_trips') }} t
 join {{ ref('stg_zones') }} pu on t.pickup_location_id = pu.location_id
 join {{ ref('stg_zones') }} dz on t.dropoff_location_id = dz.location_id
+where t.pickup_datetime >= '2025-03-01' and t.pickup_datetime < '2025-04-01'

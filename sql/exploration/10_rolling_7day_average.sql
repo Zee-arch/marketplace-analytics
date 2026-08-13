@@ -12,6 +12,11 @@ with daily as (
         cast(pickup_datetime as date) as trip_date,
         count(*) as trip_count
     from trips
+    -- scoped to March 2025 (added 2026-08-13, trips now spans 6 months --
+    -- see 01). Critical here specifically: this feeds a rolling window
+    -- function ordered by date -- without this filter the window would
+    -- silently span the Feb/Mar boundary too, changing every value
+    where pickup_datetime >= '2025-03-01' and pickup_datetime < '2025-04-01'
     group by 1
 )
 select
