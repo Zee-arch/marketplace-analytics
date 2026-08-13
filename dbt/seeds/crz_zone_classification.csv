@@ -1,0 +1,263 @@
+LocationID,Zone,Borough,pct_fee_charged,zone_group
+199,Rikers Island,Bronx,11.1,outer_borough_control
+200,Riverdale/North Riverdale/Fieldston,Bronx,8.4,outer_borough_control
+31,Bronx Park,Bronx,8.4,outer_borough_control
+168,Mott Haven/Port Morris,Bronx,6.4,outer_borough_control
+119,Highbridge,Bronx,5.2,outer_borough_control
+220,Spuyten Duyvil/Kingsbridge,Bronx,5.2,outer_borough_control
+184,Pelham Bay Park,Bronx,5.2,outer_borough_control
+59,Crotona Park,Bronx,4.9,outer_borough_control
+235,University Heights/Morris Heights,Bronx,4.6,outer_borough_control
+247,West Concourse,Bronx,4.5,outer_borough_control
+69,East Concourse/Concourse Village,Bronx,4.3,outer_borough_control
+248,West Farms/Bronx River,Bronx,4.2,outer_borough_control
+147,Longwood,Bronx,4.1,outer_borough_control
+159,Melrose South,Bronx,4.1,outer_borough_control
+182,Parkchester,Bronx,4.1,outer_borough_control
+20,Belmont,Bronx,4.0,outer_borough_control
+136,Kingsbridge Heights,Bronx,4.0,outer_borough_control
+241,Van Cortlandt Village,Bronx,3.9,outer_borough_control
+58,Country Club,Bronx,3.9,outer_borough_control
+167,Morrisania/Melrose,Bronx,3.8,outer_borough_control
+183,Pelham Bay,Bronx,3.6,outer_borough_control
+46,City Island,Bronx,3.6,outer_borough_control
+212,Soundview/Bruckner,Bronx,3.5,outer_borough_control
+60,Crotona Park East,Bronx,3.3,outer_borough_control
+240,Van Cortlandt Park,Bronx,3.2,outer_borough_control
+169,Mount Hope,Bronx,3.2,outer_borough_control
+185,Pelham Parkway,Bronx,3.2,outer_borough_control
+126,Hunts Point,Bronx,3.2,outer_borough_control
+208,Schuylerville/Edgewater Park,Bronx,3.1,outer_borough_control
+94,Fordham South,Bronx,3.0,outer_borough_control
+78,East Tremont,Bronx,3.0,outer_borough_control
+250,Westchester Village/Unionport,Bronx,2.8,outer_borough_control
+32,Bronxdale,Bronx,2.7,outer_borough_control
+213,Soundview/Castle Hill,Bronx,2.7,outer_borough_control
+47,Claremont/Bathgate,Bronx,2.7,outer_borough_control
+174,Norwood,Bronx,2.5,outer_borough_control
+18,Bedford Park,Bronx,2.5,outer_borough_control
+259,Woodlawn/Wakefield,Bronx,2.3,outer_borough_control
+242,Van Nest/Morris Park,Bronx,2.1,outer_borough_control
+3,Allerton/Pelham Gardens,Bronx,2.0,outer_borough_control
+254,Williamsbridge/Olinville,Bronx,1.9,outer_borough_control
+51,Co-Op City,Bronx,1.8,outer_borough_control
+81,Eastchester,Bronx,1.7,outer_borough_control
+66,DUMBO/Vinegar Hill,Brooklyn,36.3,outer_borough_control
+34,Brooklyn Navy Yard,Brooklyn,29.0,outer_borough_control
+33,Brooklyn Heights,Brooklyn,27.3,outer_borough_control
+256,Williamsburg (South Side),Brooklyn,24.7,outer_borough_control
+65,Downtown Brooklyn/MetroTech,Brooklyn,23.7,outer_borough_control
+54,Columbia Street,Brooklyn,23.3,outer_borough_control
+255,Williamsburg (North Side),Brooklyn,23.0,outer_borough_control
+112,Greenpoint,Brooklyn,22.1,outer_borough_control
+52,Cobble Hill,Brooklyn,20.7,outer_borough_control
+40,Carroll Gardens,Brooklyn,19.5,outer_borough_control
+97,Fort Greene,Brooklyn,18.2,outer_borough_control
+195,Red Hook,Brooklyn,18.0,outer_borough_control
+25,Boerum Hill,Brooklyn,17.8,outer_borough_control
+80,East Williamsburg,Brooklyn,16.0,outer_borough_control
+49,Clinton Hill,Brooklyn,15.5,outer_borough_control
+257,Windsor Terrace,Brooklyn,13.3,outer_borough_control
+189,Prospect Heights,Brooklyn,12.5,outer_borough_control
+181,Park Slope,Brooklyn,12.5,outer_borough_control
+106,Gowanus,Brooklyn,11.1,outer_borough_control
+37,Bushwick South,Brooklyn,10.0,outer_borough_control
+17,Bedford,Brooklyn,9.2,outer_borough_control
+36,Bushwick North,Brooklyn,8.8,outer_borough_control
+228,Sunset Park West,Brooklyn,8.5,outer_borough_control
+225,Stuyvesant Heights,Brooklyn,8.4,outer_borough_control
+190,Prospect Park,Brooklyn,8.4,outer_borough_control
+111,Green-Wood Cemetery,Brooklyn,7.6,outer_borough_control
+133,Kensington,Brooklyn,7.6,outer_borough_control
+14,Bay Ridge,Brooklyn,7.3,outer_borough_control
+67,Dyker Heights,Brooklyn,7.3,outer_borough_control
+61,Crown Heights North,Brooklyn,6.1,outer_borough_control
+217,South Williamsburg,Brooklyn,6.1,outer_borough_control
+227,Sunset Park East,Brooklyn,5.9,outer_borough_control
+89,Flatbush/Ditmas Park,Brooklyn,5.7,outer_borough_control
+62,Crown Heights South,Brooklyn,5.6,outer_borough_control
+154,Marine Park/Floyd Bennett Field,Brooklyn,5.2,outer_borough_control
+188,Prospect-Lefferts Gardens,Brooklyn,5.1,outer_borough_control
+178,Ocean Parkway South,Brooklyn,4.8,outer_borough_control
+85,Erasmus,Brooklyn,4.5,outer_borough_control
+11,Bath Beach,Brooklyn,4.2,outer_borough_control
+22,Bensonhurst West,Brooklyn,4.1,outer_borough_control
+165,Midwood,Brooklyn,3.8,outer_borough_control
+21,Bensonhurst East,Brooklyn,3.7,outer_borough_control
+55,Coney Island,Brooklyn,3.6,outer_borough_control
+123,Homecrest,Brooklyn,3.5,outer_borough_control
+177,Ocean Hill,Brooklyn,3.3,outer_borough_control
+108,Gravesend,Brooklyn,3.1,outer_borough_control
+29,Brighton Beach,Brooklyn,3.0,outer_borough_control
+71,East Flatbush/Farragut,Brooklyn,2.9,outer_borough_control
+150,Manhattan Beach,Brooklyn,2.7,outer_borough_control
+63,Cypress Hills,Brooklyn,2.6,outer_borough_control
+149,Madison,Brooklyn,2.5,outer_borough_control
+26,Borough Park,Brooklyn,2.5,outer_borough_control
+210,Sheepshead Bay,Brooklyn,2.3,outer_borough_control
+155,Marine Park/Mill Basin,Brooklyn,2.1,outer_borough_control
+91,Flatlands,Brooklyn,2.1,outer_borough_control
+77,East New York/Pennsylvania Avenue,Brooklyn,1.9,outer_borough_control
+72,East Flatbush/Remsen Village,Brooklyn,1.9,outer_borough_control
+35,Brownsville,Brooklyn,1.8,outer_borough_control
+222,Starrett City,Brooklyn,1.6,outer_borough_control
+39,Canarsie,Brooklyn,1.3,outer_borough_control
+76,East New York,Brooklyn,1.3,outer_borough_control
+1,Newark Airport,EWR,0.0,exclude_other
+105,"Governor's Island/Ellis Island/Liberty Island",Manhattan,100.0,treatment
+230,Times Sq/Theatre District,Manhattan,99.4,treatment
+100,Garment District,Manhattan,99.4,treatment
+224,Stuy Town/Peter Cooper Village,Manhattan,99.3,treatment
+164,Midtown South,Manhattan,99.3,treatment
+163,Midtown North,Manhattan,99.3,treatment
+161,Midtown Center,Manhattan,99.3,treatment
+48,Clinton East,Manhattan,99.3,treatment
+211,SoHo,Manhattan,99.2,treatment
+12,Battery Park,Manhattan,99.2,treatment
+68,East Chelsea,Manhattan,99.2,treatment
+125,Hudson Sq,Manhattan,99.2,treatment
+162,Midtown East,Manhattan,99.2,treatment
+186,Penn Station/Madison Sq West,Manhattan,99.2,treatment
+170,Murray Hill,Manhattan,99.2,treatment
+113,Greenwich Village North,Manhattan,99.2,treatment
+234,Union Sq,Manhattan,99.1,treatment
+144,Little Italy/NoLiTa,Manhattan,99.1,treatment
+148,Lower East Side,Manhattan,99.1,treatment
+229,Sutton Place/Turtle Bay North,Manhattan,99.1,treatment
+90,Flatiron,Manhattan,99.1,treatment
+107,Gramercy,Manhattan,99.1,treatment
+79,East Village,Manhattan,99.1,treatment
+233,UN/Turtle Bay South,Manhattan,99.1,treatment
+249,West Village,Manhattan,99.0,treatment
+114,Greenwich Village South,Manhattan,99.0,treatment
+231,TriBeCa/Civic Center,Manhattan,98.9,treatment
+45,Chinatown,Manhattan,98.9,treatment
+137,Kips Bay,Manhattan,98.9,treatment
+209,Seaport,Manhattan,98.8,treatment
+158,Meatpacking/West Village West,Manhattan,98.7,treatment
+232,Two Bridges/Seward Park,Manhattan,98.7,treatment
+87,Financial District North,Manhattan,98.6,treatment
+4,Alphabet City,Manhattan,98.6,treatment
+246,West Chelsea/Hudson Yards,Manhattan,98.1,treatment
+50,Clinton West,Manhattan,98.1,treatment
+261,World Trade Center,Manhattan,96.4,treatment
+88,Financial District South,Manhattan,95.8,treatment
+13,Battery Park City,Manhattan,95.6,treatment
+142,Lincoln Square East,Manhattan,70.1,border_exclude
+237,Upper East Side South,Manhattan,65.9,border_exclude
+143,Lincoln Square West,Manhattan,65.0,border_exclude
+43,Central Park,Manhattan,64.5,border_exclude
+141,Lenox Hill West,Manhattan,59.3,border_exclude
+140,Lenox Hill East,Manhattan,53.5,border_exclude
+239,Upper West Side South,Manhattan,43.2,border_exclude
+262,Yorkville East,Manhattan,42.7,border_exclude
+236,Upper East Side North,Manhattan,41.8,border_exclude
+263,Yorkville West,Manhattan,40.2,border_exclude
+238,Upper West Side North,Manhattan,30.4,border_exclude
+194,Randalls Island,Manhattan,27.2,manhattan_north_control
+151,Manhattan Valley,Manhattan,24.7,manhattan_north_control
+202,Roosevelt Island,Manhattan,24.1,manhattan_north_control
+24,Bloomingdale,Manhattan,22.6,manhattan_north_control
+166,Morningside Heights,Manhattan,21.5,manhattan_north_control
+75,East Harlem South,Manhattan,19.4,manhattan_north_control
+152,Manhattanville,Manhattan,16.0,manhattan_north_control
+116,Hamilton Heights,Manhattan,12.7,manhattan_north_control
+41,Central Harlem,Manhattan,12.5,manhattan_north_control
+244,Washington Heights South,Manhattan,12.1,manhattan_north_control
+243,Washington Heights North,Manhattan,12.0,manhattan_north_control
+74,East Harlem North,Manhattan,11.3,manhattan_north_control
+42,Central Harlem North,Manhattan,10.3,manhattan_north_control
+128,Inwood Hill Park,Manhattan,10.0,manhattan_north_control
+120,Highbridge Park,Manhattan,9.7,manhattan_north_control
+127,Inwood,Manhattan,8.2,manhattan_north_control
+153,Marble Hill,Manhattan,3.0,manhattan_north_control
+265,Outside of NYC,N/A,1.6,exclude_other
+138,LaGuardia Airport,Queens,42.6,outer_borough_control
+132,JFK Airport,Queens,26.0,outer_borough_control
+145,Long Island City/Hunters Point,Queens,24.7,outer_borough_control
+146,Long Island City/Queens Plaza,Queens,24.2,outer_borough_control
+226,Sunnyside,Queens,15.5,outer_borough_control
+193,Queensbridge/Ravenswood,Queens,13.9,outer_borough_control
+7,Astoria,Queens,12.7,outer_borough_control
+179,Old Astoria,Queens,12.3,outer_borough_control
+157,Maspeth,Queens,10.7,outer_borough_control
+260,Woodside,Queens,8.4,outer_borough_control
+223,Steinway,Queens,8.3,outer_borough_control
+83,Elmhurst/Maspeth,Queens,7.8,outer_borough_control
+8,Astoria Park,Queens,7.7,outer_borough_control
+198,Ridgewood,Queens,7.2,outer_borough_control
+70,East Elmhurst,Queens,7.0,outer_borough_control
+93,Flushing Meadows-Corona Park,Queens,6.9,outer_borough_control
+27,Breezy Point/Fort Tilden/Riis Beach,Queens,6.9,outer_borough_control
+160,Middle Village,Queens,6.7,outer_borough_control
+92,Flushing,Queens,6.6,outer_borough_control
+196,Rego Park,Queens,6.1,outer_borough_control
+96,Forest Park/Highland Park,Queens,6.0,outer_borough_control
+95,Forest Hills,Queens,5.8,outer_borough_control
+129,Jackson Heights,Queens,5.7,outer_borough_control
+56,Corona,Queens,5.2,outer_borough_control
+82,Elmhurst,Queens,4.7,outer_borough_control
+192,Queensboro Hill,Queens,4.0,outer_borough_control
+135,Kew Gardens Hills,Queens,3.8,outer_borough_control
+53,College Point,Queens,3.8,outer_borough_control
+252,Whitestone,Queens,3.7,outer_borough_control
+171,Murray Hill-Queens,Queens,3.6,outer_borough_control
+30,Broad Channel,Queens,3.6,outer_borough_control
+102,Glendale,Queens,3.6,outer_borough_control
+73,East Flushing,Queens,3.5,outer_borough_control
+15,Bay Terrace/Fort Totten,Queens,3.5,outer_borough_control
+175,Oakland Gardens,Queens,3.3,outer_borough_control
+28,Briarwood/Jamaica Hills,Queens,3.3,outer_borough_control
+9,Auburndale,Queens,3.2,outer_borough_control
+64,Douglaston,Queens,3.2,outer_borough_control
+121,Hillcrest/Pomonok,Queens,3.2,outer_borough_control
+253,Willets Point,Queens,3.1,outer_borough_control
+134,Kew Gardens,Queens,3.0,outer_borough_control
+258,Woodhaven,Queens,3.0,outer_borough_control
+173,North Corona,Queens,3.0,outer_borough_control
+98,Fresh Meadows,Queens,2.9,outer_borough_control
+131,Jamaica Estates,Queens,2.8,outer_borough_control
+16,Bayside,Queens,2.7,outer_borough_control
+201,Rockaway Park,Queens,2.7,outer_borough_control
+57,Corona,Queens,2.7,outer_borough_control
+124,Howard Beach,Queens,2.4,outer_borough_control
+38,Cambria Heights,Queens,2.2,outer_borough_control
+101,Glen Oaks,Queens,2.1,outer_borough_control
+197,Richmond Hill,Queens,2.1,outer_borough_control
+180,Ozone Park,Queens,2.0,outer_borough_control
+10,Baisley Park,Queens,1.9,outer_borough_control
+19,Bellerose,Queens,1.8,outer_borough_control
+117,Hammels/Arverne,Queens,1.8,outer_borough_control
+130,Jamaica,Queens,1.6,outer_borough_control
+191,Queens Village,Queens,1.5,outer_borough_control
+216,South Ozone Park,Queens,1.4,outer_borough_control
+122,Hollis,Queens,1.3,outer_borough_control
+86,Far Rockaway,Queens,1.1,outer_borough_control
+218,Springfield Gardens North,Queens,1.1,outer_borough_control
+207,Saint Michaels Cemetery/Woodside,Queens,1.1,outer_borough_control
+205,Saint Albans,Queens,1.0,outer_borough_control
+219,Springfield Gardens South,Queens,1.0,outer_borough_control
+215,South Jamaica,Queens,1.0,outer_borough_control
+139,Laurelton,Queens,0.9,outer_borough_control
+203,Rosedale,Queens,0.8,outer_borough_control
+2,Jamaica Bay,Queens,0.0,outer_borough_control
+110,Great Kills Park,Staten Island,3.8,outer_borough_control
+6,Arrochar/Fort Wadsworth,Staten Island,3.5,outer_borough_control
+176,Oakwood,Staten Island,3.3,outer_borough_control
+118,Heartland Village/Todt Hill,Staten Island,3.1,outer_borough_control
+204,Rossville/Woodrow,Staten Island,2.8,outer_borough_control
+214,South Beach/Dongan Hills,Staten Island,2.7,outer_borough_control
+84,"Eltingville/Annadale/Prince's Bay",Staten Island,2.4,outer_borough_control
+251,Westerleigh,Staten Island,2.3,outer_borough_control
+245,West Brighton,Staten Island,2.2,outer_borough_control
+221,Stapleton,Staten Island,2.2,outer_borough_control
+172,New Dorp/Midland Beach,Staten Island,2.2,outer_borough_control
+115,Grymes Hill/Clifton,Staten Island,2.1,outer_borough_control
+23,Bloomfield/Emerson Hill,Staten Island,2.0,outer_borough_control
+109,Great Kills,Staten Island,2.0,outer_borough_control
+44,Charleston/Tottenville,Staten Island,1.7,outer_borough_control
+5,Arden Heights,Staten Island,1.6,outer_borough_control
+206,Saint George/New Brighton,Staten Island,1.4,outer_borough_control
+187,Port Richmond,Staten Island,1.4,outer_borough_control
+156,Mariners Harbor,Staten Island,1.3,outer_borough_control
+99,Freshkills Park,Staten Island,1.1,outer_borough_control

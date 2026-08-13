@@ -1,0 +1,43 @@
+version: 2
+
+seeds:
+  - name: crz_zone_classification
+    description: >
+      Treatment/control classification for the congestion-pricing DiD
+      analysis, keyed on LocationID (not zone name text -- avoids fuzzy
+      string matching). Derived empirically from March 2025's real
+      cbd_congestion_fee incidence per pickup zone, not a hand-typed
+      street-boundary list: a zone at ~99% fee incidence is unambiguously
+      inside the Congestion Relief Zone, a zone near 0% is unambiguously
+      outside it. pct_fee_charged is kept as an audit column so the
+      classification is verifiable, not just asserted.
+
+      zone_group values:
+        treatment              -- Manhattan, >=95% fee incidence (39 zones):
+                                   unambiguously inside the CRZ
+        border_exclude         -- Manhattan, 30-95% (11 zones): genuinely
+                                   straddles the 60th St boundary --
+                                   deliberately excluded from the DiD
+                                   rather than force-classified either way
+        manhattan_north_control -- Manhattan, <30% (17 zones): outside the
+                                   CRZ but same borough -- secondary/
+                                   robustness control group
+        outer_borough_control   -- Brooklyn/Queens/Bronx/Staten Island
+                                   (193 zones): the primary control group
+                                   per the project's original design
+        exclude_other           -- Newark Airport, "Outside of NYC" (2
+                                   zones): not real NYC geography, dropped
+    columns:
+      - name: LocationID
+        tests:
+          - not_null
+          - unique
+      - name: zone_group
+        tests:
+          - accepted_values:
+              values:
+                - treatment
+                - border_exclude
+                - manhattan_north_control
+                - outer_borough_control
+                - exclude_other
