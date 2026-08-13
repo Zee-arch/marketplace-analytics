@@ -2,10 +2,13 @@
 
 [![dbt tests](https://github.com/Zee-arch/marketplace-analytics/actions/workflows/dbt_test.yml/badge.svg)](https://github.com/Zee-arch/marketplace-analytics/actions/workflows/dbt_test.yml)
 
-An end-to-end analytics project built on NYC's public High-Volume For-Hire
-Vehicle (Uber/Lyft) trip records — exploratory SQL, a tested dbt
-transformation pipeline with CI, and a causal inference study on NYC's
-2025 congestion pricing policy planned next.
+An end-to-end analytics project across two verticals: NYC's public
+High-Volume For-Hire Vehicle (Uber/Lyft) trip records — exploratory SQL,
+a tested dbt transformation pipeline with CI — and Instacart's public
+Market Basket dataset, covering the user-level growth metrics (cohorts,
+retention, churn, RFM, LTV) the mobility data can't support on its own,
+since it has no user IDs. A causal inference study on NYC's 2025
+congestion pricing policy is planned next.
 
 Built to demonstrate the skill set a data analytics role actually tests:
 SQL fluency under real messy data, correct metric definitions, data
@@ -23,6 +26,18 @@ on-scene, pickup, dropoff), pickup/dropoff zone, a detailed fare
 breakdown, driver pay, and ride-pooling flags — rich enough to support
 wait-time analysis, marketplace take-rate economics, and geographic
 demand patterns without needing a second dataset.
+
+## The delivery vertical dataset
+
+[Instacart Market Basket Analysis](https://www.kaggle.com/datasets/yasserh/instacart-online-grocery-basket-analysis-dataset)
+— 3,421,083 orders from 206,209 users, 49,688 products across 21
+departments. No dollar amounts anywhere in the schema, and no calendar
+dates either (order timing is relative — day-of-week, hour, and days
+since the previous order only) — both are real constraints of this
+public dataset, not omissions, and the metric definitions below are
+explicitly adapted around them rather than pretending they don't exist.
+
+
 
 ## Stack
 
@@ -164,15 +179,60 @@ weekly noise. Cause isn't established by this query; distinguishing
 seasonal effects from continued adjustment to congestion pricing is
 exactly what the planned difference-in-differences analysis is for.
 
+### Q11 — Order-sequence retention curve (delivery)
+100% "retention" through order 4 is a dataset-construction floor
+(Instacart only released users with 4–100 total orders), not real
+loyalty — the genuine signal starts at order 5 (88.37% of users reach
+it), declining to 53.7% by order 10, 26.15% by order 20. The top end
+(order 100) is likely also a collection ceiling, not a true behavioral
+stop — skepticism applied to both tails of the curve, not just one.
+
+### Q12 — Reorder rate (delivery)
+62.87% of items (excluding each user's structurally-reorder-free first
+order) are repeat purchases — and that rate climbs monotonically with
+tenure, from 27.24% at order 2 to 85.99% by order 100. Survivorship and
+habit formation move together: users who stick around also see their
+baskets shift toward repeat items.
+
+### Q13 — RFM segmentation (delivery)
+Recency, frequency, and the item-volume "monetary" proxy all move in the
+same direction rather than diverging — the most-recent-order tier
+averages 3x the orders and items of the most-lapsed tier. Practical
+read: lapsed users were mostly already lower-engagement beforehand, not
+high-value users who suddenly stopped. The "at-risk" tier (30+ day gap,
+censored) is also the single largest segment at 30.64% of all users.
+
+### Q14 — Churn rate (delivery)
+82.89% of all 30+-day gaps in the data are recovered from — the user
+placed at least one more order afterward. Only 17.11% are truly terminal
+(the gap coincides with a user's last observed order). A single long gap
+is a weak churn signal on its own; treating Q13's "at-risk" tier as
+confirmed churn would overstate the real non-return rate roughly 5x.
+
+### Q15 — LTV proxy by tenure (delivery)
+Cumulative item volume grows almost linearly (~10 items/order) through
+order 30, then tapers gradually to ~7.2–7.4 items/order among the
+highest-tenure users (50–99 orders) — a much flatter decay than typical
+real-dollar LTV curves, meaning high-tenure users keep contributing
+meaningful value rather than plateauing early.
+
+### Q16 — Basket composition (delivery)
+Produce (29.24%) and dairy (16.65%) together account for ~46% of every
+item purchased, both with high reorder rates. Pantry breaks that
+pattern — top-5 by volume but only 34.74% reorder rate, suggesting more
+exploratory purchasing. The product-level reorder leaderboard is
+dominated by milk variants (84–86%) and Banana — the single
+most-purchased product in the dataset (491,291 times) at 84.51% reorder
+rate, both a volume leader and a loyalty leader in the same SKU.
+
 ## What's next
 
-- **Delivery vertical**: Instacart Market Basket data — cohorts,
-  retention, LTV, RFM segmentation (mobility data has no user IDs, so
-  user-level growth metrics live here instead)
 - **Centerpiece**: difference-in-differences on NYC's January 2025
   congestion pricing policy — Manhattan south of 60th St as treatment,
   outer boroughs as control. Needs additional pre/post months downloaded
   beyond the current March-2025-only dataset
+- dbt models for the delivery vertical (currently `sql/exploration/`
+  only, same as mobility was before its dbt pipeline landed)
 - Dagster orchestration, Power BI dashboard, decision memos
 
 ## Running this locally
@@ -181,18 +241,28 @@ exactly what the planned difference-in-differences analysis is for.
 git clone https://github.com/Zee-arch/marketplace-analytics.git
 cd marketplace-analytics
 uv venv && source .venv/bin/activate
-uv pip install duckdb polars pyarrow requests dbt-core dbt-duckdb jupyterlab
+uv pip install duckdb polars pyarrow requests dbt-core dbt-duckdb kaggle jupyterlab
 
-# download the raw data (idempotent -- safe to re-run)
+# mobility vertical -- no auth needed, fully public
 python ingest/download_hvfhv.py 2025-03
 
-# build warehouse/dev.duckdb (the trips view + zones table) from it
+# delivery vertical -- needs a Kaggle account + API credential first.
+# Generate one at kaggle.com/settings/api under "Legacy API Credentials"
+# (not the newer token flow -- the kaggle package doesn't support it yet
+# as of 1.7.4.5) and save it to ~/.kaggle/kaggle.json
+mkdir -p data/raw/instacart
+kaggle datasets download -d yasserh/instacart-online-grocery-basket-analysis-dataset \
+  -p data/raw/instacart --unzip
+
+# build warehouse/dev.duckdb from whichever raw data is present --
+# skips a vertical gracefully if its source files aren't downloaded
 python ingest/init_warehouse.py
 
 # run a hand-written exploration query
 duckdb warehouse/dev.duckdb < sql/exploration/01_trips_per_day.sql
 
-# or run the dbt pipeline (staging -> intermediate -> marts) + all tests
+# or run the dbt pipeline (mobility vertical: staging -> intermediate ->
+# marts) + all tests
 cd dbt
 dbt run --profiles-dir .
 dbt test --profiles-dir .
