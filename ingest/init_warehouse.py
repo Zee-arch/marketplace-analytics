@@ -54,8 +54,19 @@ def main():
     # covers every month's file that's actually present, so downloading
     # more months later (e.g. for the congestion-pricing DiD analysis)
     # doesn't require touching this script or recreating the view by hand
+    #
+    # union_by_name := true matters as soon as more than one month is
+    # present: cbd_congestion_fee doesn't exist in files before 2025
+    # (verified -- Dec 2024's schema is missing that column entirely).
+    # Without this flag, read_parquet either errors on the schema
+    # mismatch or silently aligns columns by POSITION instead of name,
+    # which would misassign every column after the missing one. With it,
+    # pre-2025 rows correctly get NULL for cbd_congestion_fee instead.
     parquet_glob = str(DATA_RAW / "fhvhv_*.parquet")
-    con.execute(f"create or replace view trips as select * from read_parquet('{parquet_glob}')")
+    con.execute(f"""
+        create or replace view trips as
+        select * from read_parquet('{parquet_glob}', union_by_name := true)
+    """)
     print(f"trips view -> {len(parquet_files)} file(s): {[f.name for f in parquet_files]}")
 
     zone_csv = DATA_RAW / "taxi_zone_lookup.csv"
