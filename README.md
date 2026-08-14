@@ -46,10 +46,10 @@ explicitly adapted around them rather than pretending they don't exist.
 |---|---|
 | Warehouse (dev) | DuckDB |
 | Warehouse (serving) | BigQuery (planned) |
-| Transformation | dbt |
-| Orchestration | Dagster (planned) |
+| Transformation | dbt (two verticals: mobility + delivery) |
+| Orchestration | Dagster |
 | CI | GitHub Actions (real data, real warehouse build, on every push) |
-| Analysis | Python: polars, pandas, statsmodels, scipy |
+| Analysis | Python: polars, pandas, statsmodels, scipy, linearmodels |
 | BI | Power BI, Metabase (planned) |
 
 ## Repository structure
@@ -58,17 +58,23 @@ explicitly adapted around them rather than pretending they don't exist.
 sql/exploration/         -- one .sql file per question, header comment states
                              the business question, ends with a written finding
 dbt/
-  models/staging/         -- stg_trips, stg_zones -- thin, 1:1 with the source
-  models/intermediate/    -- int_trips_enriched -- zone joins, date/hour
-                             buckets, provider label, computed once
-  models/marts/           -- fct_trips, mart_daily_trip_summary,
-                             mart_hourly_demand -- the analysis-ready layer
+  models/staging/         -- stg_* -- thin, 1:1 with the source, one per raw table
+  models/intermediate/    -- int_trips_enriched, int_order_products_enriched --
+                             reusable derivations computed once (mobility + delivery)
+  models/marts/           -- fct_trips, mart_daily_trip_summary, mart_hourly_demand,
+                             mart_did_zone_daily_panel (mobility); mart_user_rfm,
+                             mart_order_sequence_summary, mart_department_basket_
+                             composition, mart_product_reorder_leaderboard (delivery)
+  seeds/                  -- crz_zone_classification -- DiD treatment/control zones
   tests/                  -- singular tests (regression checks, thresholds)
+analysis/                 -- DiD causal analysis: parallel trends, main regression,
+                             event study, secondary outcomes (Python + linearmodels)
+orchestration/             -- Dagster: ingestion + warehouse + dbt as one asset graph
 ingest/
   download_hvfhv.py        -- idempotent, retried data download
   init_warehouse.py        -- builds warehouse/dev.duckdb from data/raw/
 .github/workflows/        -- CI: downloads real data, runs dbt test on every push
-docs/memos/                -- one-page decision memos (planned)
+docs/memos/                -- decision memos, incl. the full DiD writeup
 notebooks/                 -- exploratory notebooks
 ```
 
@@ -77,21 +83,46 @@ notebooks/                 -- exploratory notebooks
 Three layers, each with a specific job: **staging** models are thin
 1:1 copies of the raw source (no logic); **intermediate** computes every
 reusable derivation exactly once (zone names, Uber/Lyft label, day-of-week/
-hour buckets, the wait/approach/dwell time intervals); **marts** are the
+hour buckets, the wait/approach/dwell time intervals for mobility;
+product/aisle/department joins for delivery); **marts** are the
 analysis-ready tables a BI tool would actually query.
 
-26 automated tests cover both layers — not_null/unique/accepted_values on
-raw columns, referential integrity between trips and zones, composite-key
-grain checks on the hourly mart, and regression tests that check a mart's
-totals against the raw source directly (the same sanity checks done by
-hand in `sql/exploration/`, now running on every push instead of once).
+Covers both verticals — mobility (`fct_trips`, the two summary marts, the
+DiD panel) and delivery (`mart_user_rfm`, `mart_order_sequence_summary`,
+basket composition, formalizing Q11/Q12/Q13/Q15/Q16). 91 automated tests
+across both — not_null/unique/accepted_values on raw columns, referential
+integrity, composite-key grain checks, and regression tests that check a
+mart's totals against the raw source directly (the same sanity checks
+done by hand in `sql/exploration/`, now running on every push instead of
+once).
 
-One test is a deliberate, visible warning rather than a hard failure: 3
-trips have an impossible (`<=0`) duration (see Q4). That's a known,
-already-investigated data quality fact, not a bug to silently hide — the
-test uses `error_if`/`warn_if` thresholds so it stays visible on every run
-without failing CI on an issue that's already been triaged, and would
-only turn into a real failure if that count grew.
+One test is a deliberate, visible warning rather than a hard failure: 20
+trips (across all 6 loaded months) have an impossible (`<=0`) duration
+(see Q4). That's a known, already-investigated data quality fact, not a
+bug to silently hide — the test uses `error_if`/`warn_if` thresholds so
+it stays visible on every run without failing CI on an issue that's
+already been triaged, and would only turn into a real failure if that
+count grew past the known baseline.
+
+## Orchestration
+
+The ingestion scripts, warehouse build, and full dbt project are wired
+into a single Dagster asset graph (`orchestration/`) — real dependency
+ordering, not a script that happens to run steps in the right order.
+`hvfhv_raw_data`/`instacart_raw_data` → `duckdb_warehouse` → every dbt
+model, each as its own tracked, lineage-visible asset. A monthly
+schedule represents the realistic production pattern for this pipeline
+(TLC publishes with a ~2 month lag), though the DiD analysis itself uses
+a fixed historical window and doesn't depend on it running.
+
+```bash
+dagster dev -m orchestration.definitions   # from the repo root -- launches the UI
+```
+
+CI only runs the mobility vertical's dbt models (`--exclude tag:delivery`)
+— the delivery vertical's source data needs a personal Kaggle credential
+CI structurally can't have, stated explicitly in the workflow rather than
+silently narrowing scope.
 
 ## Approach
 
@@ -277,9 +308,7 @@ python analysis/did_secondary_outcomes.py
 
 ## What's next
 
-- dbt models for the delivery vertical (currently `sql/exploration/`
-  only, same as mobility was before its dbt pipeline landed)
-- Dagster orchestration, Power BI dashboard
+- Power BI dashboard, decision memos for the delivery vertical
 
 ## Running this locally
 
@@ -288,7 +317,7 @@ git clone https://github.com/Zee-arch/marketplace-analytics.git
 cd marketplace-analytics
 uv venv && source .venv/bin/activate
 uv pip install duckdb polars pyarrow requests dbt-core dbt-duckdb kaggle jupyterlab \
-  statsmodels matplotlib pandas linearmodels
+  statsmodels matplotlib pandas linearmodels dagster dagster-webserver dagster-dbt
 
 # mobility vertical -- no auth needed, fully public. The DiD analysis
 # needs all 6 months (pre + post the 2025-01-05 policy date); a single
@@ -310,9 +339,10 @@ python ingest/init_warehouse.py
 # run a hand-written exploration query
 duckdb warehouse/dev.duckdb < sql/exploration/01_trips_per_day.sql
 
-# or run the dbt pipeline (mobility vertical: staging -> intermediate ->
-# marts) + all tests
-cd dbt
-dbt run --profiles-dir .
-dbt test --profiles-dir .
+# or run the dbt pipeline directly (staging -> intermediate -> marts) + all tests
+cd dbt && dbt run --profiles-dir . && dbt test --profiles-dir . && cd ..
+
+# or run everything as one Dagster asset graph instead (ingestion ->
+# warehouse -> every dbt model), with a UI showing the real lineage
+dagster dev -m orchestration.definitions
 ```
