@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Singular test: mart_user_rfm's monetary_proxy_items, summed across
 -- every user, must equal order_products_prior's total row count exactly
 -- -- every prior-order item belongs to exactly one user, counted

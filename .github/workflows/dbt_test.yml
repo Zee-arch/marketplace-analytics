@@ -12,6 +12,14 @@ name: dbt tests
 # ingestion script end-to-end instead of a stand-in, which matters more
 # for a project whose whole point is demonstrating the real pipeline.
 # The data cache below means this cost is only paid once, not every run.
+#
+# Scope: mobility vertical only (tag:delivery excluded from both run and
+# test steps). The delivery vertical's source tables come from Kaggle,
+# which needs a personal account + API credential (see CLAUDE.md) -- not
+# something a CI runner can have, and not something to try to route
+# around with a stored secret for a personal Kaggle login. Every
+# delivery-vertical model and test is tagged 'delivery' specifically so
+# this exclusion is one flag, not a maintained list of file paths.
 
 on:
   push:
@@ -56,14 +64,20 @@ jobs:
           source ../.venv/bin/activate
           dbt deps --profiles-dir .
 
-      - name: Run dbt models
+      - name: Load dbt seeds
         working-directory: dbt
         run: |
           source ../.venv/bin/activate
-          dbt run --profiles-dir .
+          dbt seed --profiles-dir .
 
-      - name: Run dbt tests
+      - name: Run dbt models (mobility vertical only)
         working-directory: dbt
         run: |
           source ../.venv/bin/activate
-          dbt test --profiles-dir .
+          dbt run --profiles-dir . --exclude tag:delivery
+
+      - name: Run dbt tests (mobility vertical only)
+        working-directory: dbt
+        run: |
+          source ../.venv/bin/activate
+          dbt test --profiles-dir . --exclude tag:delivery

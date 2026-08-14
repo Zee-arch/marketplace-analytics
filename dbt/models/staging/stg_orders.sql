@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Staging model: 1:1 with the raw source, explicit column list (already
 -- snake_case in the source CSV, unlike the TLC data -- still listed
 -- explicitly rather than select * for the same reason as everywhere

@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Mart: one row per order_number -- retention (Q11), reorder rate (Q12),
 -- and cumulative LTV-proxy tenure (Q15) all share this grain, so this
 -- mart combines all three instead of three separate one-off queries.

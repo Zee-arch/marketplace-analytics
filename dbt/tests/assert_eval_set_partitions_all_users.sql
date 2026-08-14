@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Singular test: codifies the eval_set structural fact from CLAUDE.md --
 -- every user has exactly one held-out "most recent" order, assigned to
 -- either 'train' or 'test', never both, never neither. Verified by hand

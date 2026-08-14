@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Mart: one row per department -- purchase volume share and reorder
 -- rate. Formalizes the department-level half of Q16.
 

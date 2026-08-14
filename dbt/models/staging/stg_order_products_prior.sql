@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Staging model: 1:1 with the raw source. `reordered` arrives as bigint
 -- (0/1) -- cast to boolean here, once, matching the pattern set by
 -- int_trips_enriched's is_shared_request/is_shared_match booleans.

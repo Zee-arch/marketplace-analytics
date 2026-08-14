@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Mart: one row per product -- reorder rate, floored to products with
 -- >=1,000 total purchases to avoid small-sample noise (median product
 -- has only 63 total purchases across the whole dataset; a product

@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Intermediate model: item-level detail across BOTH order_products
 -- tables, joined to product/aisle/department names and order context.
 -- Written once, reused by every downstream delivery-vertical mart that

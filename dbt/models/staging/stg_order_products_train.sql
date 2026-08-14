@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Staging model: 1:1 with the raw source. See stg_order_products_prior
 -- for the reordered -> is_reordered cast reasoning.
 

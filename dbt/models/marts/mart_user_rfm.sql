@@ -1,3 +1,5 @@
+{{ config(tags=['delivery']) }}
+
 -- Mart: one row per user -- Recency/Frequency/Monetary-proxy summary,
 -- ready for segmentation or a BI tool. Formalizes Q13.
 --
