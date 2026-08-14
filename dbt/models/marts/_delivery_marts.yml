@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: mart_user_rfm
+    description: "One row per user -- Recency/Frequency/Monetary-proxy summary. Formalizes Q13."
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+          - unique
+      - name: recency_tier
+        tests:
+          - accepted_values:
+              values:
+                - 'A: 0-7 days (very recent)'
+                - 'B: 8-14 days'
+                - 'C: 15-21 days'
+                - 'D: 22-29 days'
+                - 'E: 30+ days (censored, at-risk)'
+
+  - name: mart_order_sequence_summary
+    description: "One row per order_number -- retention, reorder rate, and LTV-proxy tenure. Formalizes Q11/Q12/Q15."
+    columns:
+      - name: order_number
+        tests:
+          - not_null
+          - unique
+
+  - name: mart_department_basket_composition
+    description: "One row per department -- volume share and reorder rate. Formalizes Q16 (department grain)."
+    columns:
+      - name: department
+        tests:
+          - not_null
+          - unique
+
+  - name: mart_product_reorder_leaderboard
+    description: "One row per product (>=1,000 purchases floor) -- reorder rate. Formalizes Q16 (product grain)."
+    columns:
+      - name: product_name
+        tests:
+          - not_null
+          - unique

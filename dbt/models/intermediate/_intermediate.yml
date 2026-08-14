@@ -30,3 +30,21 @@ models:
       - name: hour_of_day
         tests:
           - not_null
+
+  - name: int_order_products_enriched
+    description: >
+      Item-level detail across order_products_prior + order_products_train
+      combined, joined to product/aisle/department names and order
+      context. The reusable building block every delivery-vertical mart
+      needing product-level detail should select from.
+    columns:
+      - name: source_eval_set
+        tests:
+          - accepted_values:
+              values: ['prior', 'train']
+      - name: product_name
+        tests:
+          - not_null
+      - name: department
+        tests:
+          - not_null
