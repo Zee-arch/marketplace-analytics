@@ -13,3 +13,31 @@ sources:
         description: >
           NYC TLC taxi zone lookup table -- maps LocationID to Borough,
           Zone name, and service_zone. Loaded from taxi_zone_lookup.csv.
+
+      # -- delivery vertical (Instacart Market Basket) --
+      - name: orders
+        description: >
+          One row per order, all 206,209 users, all eval_set values
+          (prior/train/test). No calendar dates in this dataset --
+          order_dow/order_hour_of_day/days_since_prior_order only.
+          days_since_prior_order is capped at exactly 30 (censored, not a
+          real ceiling on gap length -- see CLAUDE.md).
+      - name: order_products_prior
+        description: >
+          Product-level detail for every eval_set='prior' order (every
+          order except each user's single held-out most recent one).
+          Safe, symmetric source for any volume/monetary-proxy metric
+          across all 206,209 users -- order_products_train is NOT, since
+          it only covers 131,209 of them (see CLAUDE.md's eval_set gotcha).
+      - name: order_products_train
+        description: >
+          Product-level detail for the 131,209 users whose held-out most
+          recent order was assigned to the public train split (vs. the
+          75,000 in the withheld test split, whose products were never
+          released).
+      - name: products
+        description: "product_id -> product_name, aisle_id, department_id."
+      - name: aisles
+        description: "aisle_id -> aisle name."
+      - name: departments
+        description: "department_id -> department name."

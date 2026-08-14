@@ -60,3 +60,99 @@ models:
         tests:
           - not_null
           - unique
+
+  # -- delivery vertical (Instacart Market Basket) --
+
+  - name: stg_orders
+    description: "One row per order, all 206,209 users, all eval_set values."
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        tests:
+          - not_null
+      - name: eval_set
+        tests:
+          - accepted_values:
+              values: ['prior', 'train', 'test']
+      - name: order_number
+        tests:
+          - not_null
+
+  - name: stg_order_products_prior
+    description: >
+      Product-level detail for eval_set='prior' orders -- the safe,
+      symmetric source for volume/monetary-proxy metrics (see
+      CLAUDE.md's eval_set gotcha).
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - order_id
+            - product_id
+
+  - name: stg_order_products_train
+    description: "Product-level detail for eval_set='train' orders only (131,209 of 206,209 users)."
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - order_id
+            - product_id
+
+  - name: stg_products
+    columns:
+      - name: product_id
+        tests:
+          - not_null
+          - unique
+      - name: aisle_id
+        tests:
+          - relationships:
+              to: ref('stg_aisles')
+              field: aisle_id
+      - name: department_id
+        tests:
+          - relationships:
+              to: ref('stg_departments')
+              field: department_id
+
+  - name: stg_aisles
+    columns:
+      - name: aisle_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_departments
+    columns:
+      - name: department_id
+        tests:
+          - not_null
+          - unique
