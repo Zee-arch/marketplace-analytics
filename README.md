@@ -89,8 +89,8 @@ analysis-ready tables a BI tool would actually query.
 
 Covers both verticals — mobility (`fct_trips`, the two summary marts, the
 DiD panel) and delivery (`mart_user_rfm`, `mart_order_sequence_summary`,
-basket composition, formalizing Q11/Q12/Q13/Q15/Q16). 91 automated tests
-across both — not_null/unique/accepted_values on raw columns, referential
+basket composition, formalizing Q11/Q12/Q13/Q15/Q16). 72 automated tests
+across both (verified via `dbt test --profiles-dir .`, not estimated) — not_null/unique/accepted_values on raw columns, referential
 integrity, composite-key grain checks, and regression tests that check a
 mart's totals against the raw source directly (the same sanity checks
 done by hand in `sql/exploration/`, now running on every push instead of
