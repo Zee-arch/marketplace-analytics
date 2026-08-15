@@ -257,6 +257,13 @@ dominated by milk variants (84–86%) and Banana — the single
 most-purchased product in the dataset (491,291 times) at 84.51% reorder
 rate, both a volume leader and a loyalty leader in the same SKU.
 
+Full write-ups for the delivery vertical (Q11–Q16), promoted to
+standalone decision memos the same way the DiD analysis was, live in
+`docs/memos/`: [retention & reorder](docs/memos/05_retention_and_reorder.md),
+[RFM & the churn reality check](docs/memos/06_rfm_and_churn.md),
+[LTV proxy by tenure](docs/memos/07_ltv_proxy_by_tenure.md), and
+[basket composition](docs/memos/08_basket_composition.md).
+
 ## Congestion Pricing DiD — the centerpiece
 
 A difference-in-differences study of NYC's January 5, 2025 congestion
@@ -308,7 +315,7 @@ python analysis/did_secondary_outcomes.py
 
 ## What's next
 
-- Power BI dashboard, decision memos for the delivery vertical
+- Power BI dashboard
 
 ## Running this locally
 
